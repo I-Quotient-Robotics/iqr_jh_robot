@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="config" default="base"/>
+  <!-- fix for oneweek project -->
+  <arg name="env_runner" value="$(eval 'env_run' if not optenv('OS', 'unknown').lower().startswith('windows') else 'env_run.bat')"/>
+
+  <!-- Robot Description -->
+  <arg name="model" default="$(find xacro)/xacro --inorder $(find iqr_jh_description)/urdf/iqr_jh_robot.urdf.xacro"/>
+  <param name="robot_description" command="$(arg model)"/>
+
+  <!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/-->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <!-- jackal -->
+  <include file="$(find iqr_jh_bringup)/launch/include/jackal.launch.xml">
+  </include>
+
+  <!-- VLP16 -->
+  <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
+    <arg name="device_ip" default="192.168.3.7"/>
+    <arg name="frame_id" default="velodyne"/>
+    <arg name="max_range" default="100.0"/>
+    <arg name="rpm" default="600"/>
+  </include>
+
+  <!-- zed -->
+  <include file="$(find zed_wrapper)/launch/zed.launch">
+  </include>
+
+  <!-- livox -->
+  <include file="$(find livox_ros_driver)/launch/livox_lidar.launch">
+  </include>
+
+  <!-- realsense d435i -->
+  <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+    <arg name="tf_prefix"             value="camera"/>
+    <arg name="initial_reset"         value="false"/>
+    <arg name="enable_sync"           value="true"/>
+    <arg name="align_depth"           value="true"/>
+    <arg name="enable_pointcloud"     value="true"/>
+  </include>
+
+  <!-- IMU -->
+  <node pkg="jy901_driver" type="jy901_driver_node" name="jy901_driver_node" output="screen" >
+    <param name="baudrate" type="int" value="115200" />
+    <param name="port" type="string" value="/dev/ttyUART_232_1"/>
+    <param name="looprate" type="int" value="50" />
+  </node>
+
+  <!-- GPS -->
+  <!-- <node name="nmea_serial_driver_node" pkg="nmea_navsat_driver" type="nmea_serial_driver" output="screen">
+    <param name="port" value="/dev/ttyUART_232_2"/>
+    <param name="baud" value="115200"/>
+    <param name="frame_id" value="rtc_gps_link"/>
+    <param name="use_GNSS_time" value="false"/>
+    <param name="time_ref_source" value="gps"/>
+    <param name="useRMC" value="false"/>
+  </node> -->
+  <include file="$(find nmea_ros_driver)/launch/bringup.launch">
+    <arg name="nmea_com" value="/dev/ttyUART_232_2"/>
+    <arg name="frame_id" value="/rtc_gps_link"/>
+  <include/>
+
+  <!-- Robot pose ekf -->
+  <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" output="screen">
+    <param name="output_frame" value="odom"/>
+    <param name="base_footprint_frame" value="base_link"/>
+    <param name="freq" value="50.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="true"/>
+    <param name="vo_used" value="false"/>
+    <param name="debug" value="false"/>
+    <param name="self_diagnose" value="false"/>
+    <remap from="imu_data" to="/imu/data"/>
+    <remap from="odom" to="/jackal_velocity_controller/odom"/>
+  </node>
+
+</launch>
