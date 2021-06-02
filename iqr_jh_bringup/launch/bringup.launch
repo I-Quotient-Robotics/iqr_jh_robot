@@ -18,14 +18,16 @@
 
   <!-- VLP16 -->
   <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
-    <arg name="device_ip" default="192.168.3.7"/>
-    <arg name="frame_id" default="velodyne"/>
-    <arg name="max_range" default="100.0"/>
-    <arg name="rpm" default="600"/>
+    <arg name="device_ip" value="192.168.3.7"/>
+    <arg name="frame_id"  value="velodyne"/>
+    <arg name="max_range" value="100.0"/>
+    <arg name="rpm"       value="600"/>
   </include>
 
   <!-- zed -->
-  <include file="$(find zed_wrapper)/launch/zed.launch">
+  <include file="$(find zed_wrapper)/launch/zed2.launch">
+    <arg name="publish_urdf"    value="false"/>
+    <arg name="base_frame"      value="zed2_link"/>
   </include>
 
   <!-- livox -->
@@ -44,7 +46,7 @@
   <!-- IMU -->
   <node pkg="jy901_driver" type="jy901_driver_node" name="jy901_driver_node" output="screen" >
     <param name="baudrate" type="int" value="115200" />
-    <param name="port" type="string" value="/dev/ttyUART_232_1"/>
+    <param name="port" type="string"  value="/dev/ttyUART_232_1"/>
     <param name="looprate" type="int" value="50" />
   </node>
 
