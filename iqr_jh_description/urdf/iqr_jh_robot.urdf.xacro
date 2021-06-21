@@ -9,6 +9,7 @@
   <!-- Include accessories -->
   <xacro:include filename="$(find ${package_name})/urdf/zed2.xacro"/>
   <xacro:include filename="$(find ${package_name})/urdf/vlp16.xacro"/>
+  <xacro:include filename="$(find ${package_name})/urdf/gps_antenna.xacro"/>
   <xacro:include filename="$(find ${package_name})/urdf/livox_horizon.xacro"/>
   <xacro:include filename="$(find ${package_name})/urdf/sensor_support.xacro"/>
   <xacro:include filename="$(find ${package_name})/urdf/realsense_d435.xacro"/>
@@ -38,4 +39,8 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:sensor_d435>
 
+  <!-- GPS -->
+  <xacro:gps_antenna package="${package_name}" name="rtk" parent="rtk_gps_mount_link">
+    <origin xyz="0 0 0.02" rpy="0 0 0"/>
+  </xacro:gps_antenna>
 </robot>
