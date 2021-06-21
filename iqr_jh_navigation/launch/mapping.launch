@@ -12,7 +12,7 @@
   <!--rviz display-->
   <arg name="viz" default="false"/>
   <group if="$(arg viz)">
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find iqr_jh_navigation)/rviz/gmapping.rviz"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find iqr_jh_navigation)/rviz/mapping.rviz"/>
   </group>
   
 </launch>

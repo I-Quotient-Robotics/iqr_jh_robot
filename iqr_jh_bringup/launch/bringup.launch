@@ -6,7 +6,7 @@
   <arg name="env_runner" value="$(eval 'env_run' if not optenv('OS', 'unknown').lower().startswith('windows') else 'env_run.bat')"/>
 
   <!-- Robot Description -->
-  <arg name="model" default="$(find xacro)/xacro --inorder $(find iqr_jh_description)/urdf/iqr_jh_robot.urdf.xacro"/>
+  <arg name="model" default="$(find xacro)/xacro $(find iqr_jh_description)/urdf/iqr_jh_robot.urdf.xacro"/>
   <param name="robot_description" command="$(arg model)"/>
 
   <!--node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/-->
@@ -25,7 +25,7 @@
   </include>
 
   <!-- zed -->
-  <include file="$(find zed_wrapper)/launch/zed2.launch">
+  <include file="$(find zed_wrapper)/launch/zed_no_tf.launch">
     <arg name="publish_urdf"    value="false"/>
     <arg name="base_frame"      value="zed2_link"/>
   </include>
@@ -35,34 +35,32 @@
   </include>
 
   <!-- realsense d435i -->
-  <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+  <include file="$(find realsense2_camera)/launch/rs_rgbd.launch">
     <arg name="tf_prefix"             value="camera"/>
-    <arg name="initial_reset"         value="false"/>
-    <arg name="enable_sync"           value="true"/>
-    <arg name="align_depth"           value="true"/>
-    <arg name="enable_pointcloud"     value="true"/>
+    <!-- <arg name="enable_pointcloud"     value="true"/> -->
   </include>
 
   <!-- IMU -->
   <node pkg="jy901_driver" type="jy901_driver_node" name="jy901_driver_node" output="screen" >
-    <param name="baudrate" type="int" value="115200" />
+    <param name="looprate" type="int" value="50"/>
+    <param name="baudrate" type="int" value="115200"/>
     <param name="port" type="string"  value="/dev/ttyUART_232_1"/>
-    <param name="looprate" type="int" value="50" />
+    <param name="frame_name" type="string"  value="custom_imu_link"/>
   </node>
 
   <!-- GPS -->
   <!-- <node name="nmea_serial_driver_node" pkg="nmea_navsat_driver" type="nmea_serial_driver" output="screen">
     <param name="port" value="/dev/ttyUART_232_2"/>
     <param name="baud" value="115200"/>
-    <param name="frame_id" value="rtc_gps_link"/>
+    <param name="frame_id" value="rtk_gps_link"/>
     <param name="use_GNSS_time" value="false"/>
     <param name="time_ref_source" value="gps"/>
     <param name="useRMC" value="false"/>
   </node> -->
   <include file="$(find nmea_ros_driver)/launch/bringup.launch">
-    <arg name="nmea_com" value="/dev/ttyUART_232_2"/>
-    <arg name="frame_id" value="/rtc_gps_link"/>
-  <include/>
+    <arg name="nmea_com"  value="/dev/ttyUART_232_2"/>
+    <arg name="frame_id"  value="/rtk_gps_link"/>
+  </include>
 
   <!-- Robot pose ekf -->
   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" output="screen">

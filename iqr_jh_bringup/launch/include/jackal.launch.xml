@@ -18,7 +18,7 @@
           - wifi_connected
     </rosparam>
     <param name="port" value="$(arg jackal_port)" />
-    <param name="wireless_interface" value="$(optenv JACKAL_WIRELESS_INTERFACE wlp0s20f3)"/>
+    <param name="wireless_interface" value="$(optenv JACKAL_WIRELESS_INTERFACE wlan0)"/>
   </node>
 
   <!-- TODO: Eliminate this by compiling the necessary message definitions into jackal_base. -->
@@ -28,14 +28,14 @@
   <node pkg="nmea_navsat_driver" type="nmea_topic_driver" name="nmea_topic_driver" ns="navsat"/>
 
   <!-- Filter raw gyro data into a usable IMU message -->
-  <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
+  <!-- <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
     <rosparam file="$(eval optenv('JACKAL_MAG_CONFIG', find('jackal_base')+'/config/mag_config_default.yaml'))"/>
     <rosparam>
       gain: 0.1
       zeta: 0.001
       publish_tf: false
     </rosparam>
-  </node>
+  </node> -->
 
   <!-- Differential controller and basic localization -->
   <include file="$(find jackal_control)/launch/control.launch">
